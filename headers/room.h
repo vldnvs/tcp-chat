@@ -3,6 +3,7 @@
 
 class User;
 #include <vector>
+#include <string>
 
 
 static std::vector<User*> usersInRoom;

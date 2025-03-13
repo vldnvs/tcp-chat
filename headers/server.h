@@ -27,8 +27,8 @@ public:
 private:
 	void waitForConnection();
 	void acceptHandler(const boost::system::error_code& ec, User* ptr);
-	void handle_write(const boost::system::error_code&,
-		size_t
+	void handle_write(const boost::system::error_code& /*error*/,
+		size_t) {
 
 	};
 	void monitor();

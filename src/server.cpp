@@ -20,6 +20,9 @@ void Server::monitor() {
 				else if (input == "/shutdown"){
 					break;
 				}
+				else {
+					std::cout << "Unknown command. Available commands are: /show_uptime, /shutdown" << std::endl;
+				}
         }
         for (User* ptr : room->getUsers()) {
                 ptr->disconnect();

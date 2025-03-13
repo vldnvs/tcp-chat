@@ -1,10 +1,5 @@
 #include "server.h"
 
-void pauseOneSecond() noexcept {
-        std::chrono::time_point<clock_> pause = clock_::now();
-        while (clock_::now() - pause < std::chrono::duration<double>(1)) {};
-}
-
 Server::Server(io_serv& io) :accept(io, tcp::endpoint(tcp::v4(), 13)), server_time(clock_::now()) {
         waitForConnection();
         room = new Room();
@@ -12,17 +7,31 @@ Server::Server(io_serv& io) :accept(io, tcp::endpoint(tcp::v4(), 13)), server_ti
 }
 
 void Server::monitor() {
-        int count = AUTOMATIC_SHUTDOWN_IN_SECS;
-        std::string input;
-        while (true) {
-                std::cout << ">> ";
-                std::getline(std::cin, input);
-                if (input == "show_uptime")std::cout<<std::chrono::duration<double>(clock_::now() - this->server_time ).count()<< std::endl;
-        }
-        for (User* ptr : room->getUsers()) {
+	// int count = AUTOMATIC_SHUTDOWN_IN_SECS; ToDo: запилить автоматический шатдаун 
+    std::string input;
+    while (true) {
+        std::cout << ">> ";
+        std::getline(std::cin, input);
+
+        if (input == "show_uptime") {
+            std::cout << "Server uptime: " 
+                      << std::chrono::duration<double>(clock_::now() - this->server_time).count() 
+                      << " seconds" << std::endl;
+        } 
+        else if (input == "/shutdown") {
+            std::cout << "Shutting down server..." << std::endl;
+
+            for (User* ptr : room->getUsers()) {
                 ptr->disconnect();
+            }
+
+            accept.get_executor().context().stop();
+
+            return;
         }
+    }
 }
+
 void Server::waitForConnection() {
         User* ptr = User::getPointer(static_cast<boost::asio::io_context&>(accept.get_executor().context()), room);
         accept.async_accept(ptr->getSocket(), boost::bind(&Server::acceptHandler, this, boost::asio::placeholders::error, ptr));

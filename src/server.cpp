@@ -24,6 +24,7 @@ void Server::monitor() {
         for (User* ptr : room->getUsers()) {
                 ptr->disconnect();
         }
+		return;
 }
 
 void Server::waitForConnection() {

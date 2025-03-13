@@ -7,29 +7,23 @@ Server::Server(io_serv& io) :accept(io, tcp::endpoint(tcp::v4(), 13)), server_ti
 }
 
 void Server::monitor() {
-	// int count = AUTOMATIC_SHUTDOWN_IN_SECS; ToDo: запилить автоматический шатдаун 
-    std::string input;
-    while (true) {
-        std::cout << ">> ";
-        std::getline(std::cin, input);
-
-        if (input == "show_uptime") {
-            std::cout << "Server uptime: " 
+        // int count = AUTOMATIC_SHUTDOWN_IN_SECS; ToDo: запилить автоматический шатдаун 
+        std::string input;
+        while (true) {
+                std::cout << ">> ";
+                std::getline(std::cin, input);
+                if (input == "/show_uptime"){
+					std::cout << "Server uptime: " 
                       << std::chrono::duration<double>(clock_::now() - this->server_time).count() 
                       << " seconds" << std::endl;
-        } 
-        else if (input == "/shutdown") {
-            std::cout << "Shutting down server..." << std::endl;
-
-            for (User* ptr : room->getUsers()) {
-                ptr->disconnect();
-            }
-
-            accept.get_executor().context().stop();
-
-            return;
+				}
+				else if (input == "/shutdown"){
+					break;
+				}
         }
-    }
+        for (User* ptr : room->getUsers()) {
+                ptr->disconnect();
+        }
 }
 
 void Server::waitForConnection() {

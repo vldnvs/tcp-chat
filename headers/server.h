@@ -4,7 +4,7 @@
 
 #include <boost/asio.hpp>
 #include <boost/bind.hpp>
-#include <user.h>
+#include "user.h"
 #include <chrono>
 #include <thread>
 
@@ -22,13 +22,13 @@ class Server {
 
 public:
 
-	Server(io_serv& io);/* :accept(io, tcp::endpoint(tcp::v4(), 13))*/
+	Server(io_serv& io);
 
 private:
 	void waitForConnection();
 	void acceptHandler(const boost::system::error_code& ec, User* ptr);
-	void handle_write(const boost::system::error_code& /*error*/,
-		size_t /*bytes_transferred*/) {
+	void handle_write(const boost::system::error_code&,
+		size_t
 
 	};
 	void monitor();

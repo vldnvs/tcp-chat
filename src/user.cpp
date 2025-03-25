@@ -16,7 +16,6 @@ void User::queueMsg(std::string msg) {
 	Logger::log("Message queued for user: " + (nameSet ? name : "unnamed") + 
 				" (Queue size: " + std::to_string(writeBuffer.size()) + ")", "User");
 	
-	// Запускаем асинхронную запись только если это первое сообщение в очереди
 	if (writeBuffer.size() == 1) {
 		boost::asio::async_write(
 			socket_,
@@ -100,7 +99,6 @@ void User::handle_read(const boost::system::error_code& error, size_t)
 		
 		line.erase(std::remove(line.begin(), line.end(), '\r'), line.end());
 		line.erase(std::remove(line.begin(), line.end(), '\n'), line.end());
-		line.erase(std::remove(line.begin(), line.end(), ' '), line.end());
 		
 		if (line.empty()) {
 			Logger::log("Empty message received from user: " + (nameSet ? name : "unnamed"), "User");
@@ -126,10 +124,8 @@ void User::handle_read(const boost::system::error_code& error, size_t)
 			return;
 		}
 
-		// Создаем копию сообщения для асинхронной обработки
-		std::string message = line + "\r\n";
+		std::string message = name + ": " + line + "\r\n";
 		
-		// Проверяем состояние сокета перед асинхронной отправкой
 		if (socket_.is_open()) {
 			Logger::log("Socket is open, scheduling message delivery for user: " + name, "User");
 			boost::asio::post(socket_.get_executor(), [this, message]() {

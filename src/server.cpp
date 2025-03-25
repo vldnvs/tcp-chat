@@ -59,7 +59,7 @@ void Server::healthCheck() {
         
         for (User* user : room->getUsers()) {
                 if (user->nameSet) {
-                        boost::asio::post(io_service, [user]() {
+                        boost::asio::post(io_service, [this, user]() {
                                 auto now = clock_::now();
                                 auto uptime = std::chrono::duration<double>(now - user->uptime).count();
                                 
@@ -73,7 +73,7 @@ void Server::healthCheck() {
                                 user->queueMsg("PING\r\n");
                                 
                                 auto timer = std::make_shared<boost::asio::deadline_timer>(
-                                        io_service,
+                                        this->io_service,
                                         boost::posix_time::seconds(20)
                                 );
                                 

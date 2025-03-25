@@ -2,6 +2,11 @@
 
 
 void User::queueMsg(std::string msg) {
+		// Убеждаемся, что сообщение заканчивается на \r\n
+		if (msg.length() < 2 || msg.substr(msg.length() - 2) != "\r\n") {
+			msg += "\r\n";
+		}
+		
 		writeBuffer.push_back(msg);
 		boost::asio::async_write
 		(
@@ -15,8 +20,6 @@ void User::queueMsg(std::string msg) {
 				boost::asio::placeholders::bytes_transferred
 			)
 		);
-
-
 }
 
  
@@ -47,13 +50,24 @@ void User::handle_write(const boost::system::error_code& error, size_t)
 
 void User::handle_read(const boost::system::error_code& error, size_t)
 {
-	if (!error )
+	if (!error)
 	{
 		std::istream is(&readBuffer);
 		std::string line;
 		std::getline(is, line);
-		line=line.substr(0, line.length() - 1);
-		std::cout << line << std::endl;
+		
+		// Удаляем все символы конца строки и пробелы
+		line.erase(std::remove(line.begin(), line.end(), '\r'), line.end());
+		line.erase(std::remove(line.begin(), line.end(), '\n'), line.end());
+		line.erase(std::remove(line.begin(), line.end(), ' '), line.end());
+		
+		if (line.empty()) {
+			readMsg();
+			return;
+		}
+		
+		std::cout << "Received: " << line << std::endl;
+		
 		if (!nameSet) {
 			name = line;
 			nameSet = true;
@@ -61,10 +75,19 @@ void User::handle_read(const boost::system::error_code& error, size_t)
 			return;
 		}
 
-		chatRoom->deliverMessage(line+"\r\n", this);
+		// Обработка PONG сообщения
+		if (line == "PONG") {
+			waitingForPong = false;
+			uptime = clock_::now();
+			readMsg();
+			return;
+		}
+
+		boost::asio::post(socket_.get_executor(), [this, line]() {
+			chatRoom->deliverMessage(line + "\r\n", this);
+		});
 
 		readMsg();
-
 	}
 	else {
 		chatRoom->removeUser(this);

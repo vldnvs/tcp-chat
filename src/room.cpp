@@ -17,7 +17,10 @@ void Room::removeUser(User* user) {
 void Room::deliverMessage(std::string msg, User* sender) {
 	for (User* recipient : usersInRoom) {
 		if (recipient != sender && recipient->nameSet) {
-			recipient->queueMsg(sender->name + ": " + msg);
+			// Асинхронная отправка сообщения каждому получателю
+			boost::asio::post(recipient->getSocket().get_executor(), [recipient, sender, msg]() {
+				recipient->queueMsg(sender->name + ": " + msg);
+			});
 		}
 	}
 }

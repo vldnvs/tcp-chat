@@ -7,22 +7,34 @@
 #include "user.h"
 #include <chrono>
 #include <thread>
+#include <vector>
 
 
 typedef boost::asio::io_service io_serv;
 using boost::asio::ip::tcp;
 
 class Server {
-	tcp::acceptor accept;
 	Room* room;
-	std::chrono::time_point<clock_> server_time;
-	std::thread monitoringThread;
-	const int AUTOMATIC_SHUTDOWN_IN_SECS = 20;
+	tcp::acceptor accept;
 	boost::asio::streambuf commandLineBuffer;
+	io_serv& io_service;
+	std::chrono::time_point<clock_> server_time;
+	std::vector<std::thread> thread_pool;
+	std::thread monitoringThread;
+	bool is_running = true;
+	const int AUTOMATIC_SHUTDOWN_IN_SECS = 20;
+	const int THREAD_POOL_SIZE = 4;
 
 public:
 
 	Server(io_serv& io);
+	~Server();
+	void stop() { 
+		is_running = false; 
+		io_service.stop(); 
+	}
+	bool running() const { return is_running; }
+	void setupSignalHandlers();
 
 private:
 	void waitForConnection();
@@ -32,7 +44,8 @@ private:
 
 	};
 	void monitor();
-
+	void startThreadPool();
+	void healthCheck();
 };
 
 

@@ -1,9 +1,22 @@
 #include <boost/asio.hpp>
 #include "server.h"
-
+#include <thread>
+#include <chrono>
+#include <csignal>
+#include <iostream>
 
 int main() {
-	boost::asio::io_service io;
-	Server server(io);
-	io.run();
+	try {
+		boost::asio::io_service io;
+		Server server(io);
+		
+		// Запускаем io_service в главном потоке
+		io.run();
+		
+		return 0;
+	}
+	catch (std::exception& e) {
+		std::cerr << "Exception: " << e.what() << std::endl;
+		return 1;
+	}
 }

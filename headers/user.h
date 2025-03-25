@@ -22,6 +22,8 @@ public:
 	bool nameSet = false;
 	std::chrono::time_point<clock_> uptime;
 	std::string name;
+	bool waitingForPong = false;
+	std::chrono::time_point<clock_> lastPingTime;
 
 public:
 

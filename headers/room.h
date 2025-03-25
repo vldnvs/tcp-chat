@@ -15,8 +15,6 @@ public:
 	void removeUser(User* user);
 	void deliverMessage(std::string msg, User* sender);
 	std::vector<User*> getUsers();
-
-
 };
 
 #endif

@@ -16,18 +16,19 @@ void User::queueMsg(std::string msg) {
 	Logger::log("Message queued for user: " + (nameSet ? name : "unnamed") + 
 				" (Queue size: " + std::to_string(writeBuffer.size()) + ")", "User");
 	
-	boost::asio::async_write
-	(
-		socket_,
-		boost::asio::buffer(writeBuffer.front().data(), writeBuffer.front().length()),
-		boost::bind
-		(
-			&User::handle_write,
-			this,
-			boost::asio::placeholders::error,
-			boost::asio::placeholders::bytes_transferred
-		)
-	);
+	// Запускаем асинхронную запись только если это первое сообщение в очереди
+	if (writeBuffer.size() == 1) {
+		boost::asio::async_write(
+			socket_,
+			boost::asio::buffer(writeBuffer.front().data(), writeBuffer.front().length()),
+			boost::bind(
+				&User::handle_write,
+				this,
+				boost::asio::placeholders::error,
+				boost::asio::placeholders::bytes_transferred
+			)
+		);
+	}
 }
 
  
@@ -56,24 +57,28 @@ void User::handle_write(const boost::system::error_code& error, size_t)
 {
 	if (!error && socket_.is_open())
 	{
-		writeBuffer.pop_front();
-		Logger::log("Message sent to user: " + (nameSet ? name : "unnamed") + 
-					" (Remaining queue size: " + std::to_string(writeBuffer.size()) + ")", "User");
-		
-		if (!writeBuffer.empty())
-		{
-			Logger::log("Processing next message in queue for user: " + (nameSet ? name : "unnamed"), "User");
-			boost::asio::async_write(
-				socket_,
-				boost::asio::buffer(writeBuffer.front().data(),
-					writeBuffer.front().length()),
-				boost::bind(
-					&User::handle_write,
-					this,
-					boost::asio::placeholders::error, 
-					boost::asio::placeholders::bytes_transferred
-				)
-			);
+		if (!writeBuffer.empty()) {
+			writeBuffer.pop_front();
+			Logger::log("Message sent to user: " + (nameSet ? name : "unnamed") + 
+						" (Remaining queue size: " + std::to_string(writeBuffer.size()) + ")", "User");
+			
+			if (!writeBuffer.empty())
+			{
+				Logger::log("Processing next message in queue for user: " + (nameSet ? name : "unnamed"), "User");
+				boost::asio::async_write(
+					socket_,
+					boost::asio::buffer(writeBuffer.front().data(),
+						writeBuffer.front().length()),
+					boost::bind(
+						&User::handle_write,
+						this,
+						boost::asio::placeholders::error, 
+						boost::asio::placeholders::bytes_transferred
+					)
+				);
+			}
+		} else {
+			Logger::log("Write buffer is empty for user: " + (nameSet ? name : "unnamed"), "User");
 		}
 	}
 	else

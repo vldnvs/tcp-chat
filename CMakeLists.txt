@@ -23,7 +23,7 @@ set(HEADERS
 )
 
 
-find_package(Boost REQUIRED COMPONENTS system thread regex)
+find_package(Boost REQUIRED COMPONENTS system thread regex unit_test_framework)
 if(Boost_FOUND)
     include_directories(${Boost_INCLUDE_DIRS})
     message(STATUS "Boost found: ${Boost_INCLUDE_DIRS}")
@@ -34,3 +34,20 @@ endif()
 add_executable(${PROJECT_NAME} ${SOURCES} ${HEADERS})
 
 target_link_libraries(${PROJECT_NAME} Boost::system Boost::thread Boost::regex)
+
+# Добавление тестов
+option(BUILD_TESTS "Build the tests" ON)
+if(BUILD_TESTS)
+    enable_testing()
+    
+    set(TEST_SOURCES
+        tests/chat_tests.cpp
+        src/user.cpp
+        src/server.cpp
+        src/room.cpp
+    )
+    
+    add_executable(chat_tests ${TEST_SOURCES} ${HEADERS})
+    target_link_libraries(chat_tests Boost::system Boost::thread Boost::regex Boost::unit_test_framework)
+    add_test(NAME ChatTests COMMAND chat_tests)
+endif()

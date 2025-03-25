@@ -7,7 +7,7 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
-include_directories(Headers)
+include_directories(${CMAKE_SOURCE_DIR}/headers)
 
 set(SOURCES
     src/main.cpp
@@ -35,7 +35,6 @@ add_executable(${PROJECT_NAME} ${SOURCES} ${HEADERS})
 
 target_link_libraries(${PROJECT_NAME} Boost::system Boost::thread Boost::regex)
 
-# Добавление тестов
 option(BUILD_TESTS "Build the tests" ON)
 if(BUILD_TESTS)
     enable_testing()

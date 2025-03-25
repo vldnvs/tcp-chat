@@ -73,7 +73,7 @@ void Server::healthCheck() {
                                 user->queueMsg("PING\r\n");
                                 
                                 auto timer = std::make_shared<boost::asio::deadline_timer>(
-                                        user->getSocket().get_executor().context(),
+                                        io_service,
                                         boost::posix_time::seconds(20)
                                 );
                                 
@@ -99,12 +99,13 @@ void Server::healthCheck() {
 void Server::monitor() {
         boost::asio::posix::stream_descriptor input(io_service, ::dup(STDIN_FILENO));
         
-        auto asyncReadLine = [this, &input](boost::asio::streambuf& buffer) {
+        std::function<void(boost::asio::streambuf&)> asyncReadLine;
+        asyncReadLine = [this, &input, &asyncReadLine](boost::asio::streambuf& buffer) {
                 boost::asio::async_read_until(
                         input, 
                         buffer, 
                         '\n',
-                        [this, &input, &buffer](const boost::system::error_code& ec, std::size_t size) {
+                        [this, &input, &buffer, &asyncReadLine](const boost::system::error_code& ec, std::size_t size) {
                                 if (!ec && is_running) {
                                         std::istream is(&buffer);
                                         std::string line;
@@ -144,7 +145,7 @@ void Server::monitor() {
 void Server::waitForConnection() {
         if (!is_running) return;
         
-        User* ptr = User::getPointer(static_cast<boost::asio::io_context&>(accept.get_executor().context()), room);
+        User* ptr = User::getPointer(io_service, room);
         accept.async_accept(ptr->getSocket(), boost::bind(&Server::acceptHandler, this, boost::asio::placeholders::error, ptr));
 }
 

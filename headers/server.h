@@ -1,14 +1,14 @@
 #ifndef SERVER_H
 #define SERVER_H
 
-
 #include <boost/asio.hpp>
 #include <boost/bind.hpp>
+#include <boost/function.hpp>
 #include "user.h"
 #include <chrono>
 #include <thread>
 #include <vector>
-
+#include <functional>
 
 typedef boost::asio::io_service io_serv;
 using boost::asio::ip::tcp;

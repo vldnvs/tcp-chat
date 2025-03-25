@@ -10,7 +10,6 @@ int main() {
 		boost::asio::io_service io;
 		Server server(io);
 		
-		// Запускаем io_service в главном потоке
 		io.run();
 		
 		return 0;

@@ -4,7 +4,7 @@
 
 void User::queueMsg(std::string msg) {
 	if (!socket_.is_open()) {
-		Logger::error("Attempt to queue message to closed socket", "User");
+		Logger::error("Attempt to queue message to closed socket for user: " + (nameSet ? name : "unnamed"), "User");
 		return;
 	}
 
@@ -13,7 +13,8 @@ void User::queueMsg(std::string msg) {
 	}
 	
 	writeBuffer.push_back(msg);
-	Logger::log("Message queued for user: " + (nameSet ? name : "unnamed"), "User");
+	Logger::log("Message queued for user: " + (nameSet ? name : "unnamed") + 
+				" (Queue size: " + std::to_string(writeBuffer.size()) + ")", "User");
 	
 	boost::asio::async_write
 	(
@@ -56,10 +57,12 @@ void User::handle_write(const boost::system::error_code& error, size_t)
 	if (!error && socket_.is_open())
 	{
 		writeBuffer.pop_front();
-		Logger::log("Message sent to user: " + (nameSet ? name : "unnamed"), "User");
+		Logger::log("Message sent to user: " + (nameSet ? name : "unnamed") + 
+					" (Remaining queue size: " + std::to_string(writeBuffer.size()) + ")", "User");
 		
 		if (!writeBuffer.empty())
 		{
+			Logger::log("Processing next message in queue for user: " + (nameSet ? name : "unnamed"), "User");
 			boost::asio::async_write(
 				socket_,
 				boost::asio::buffer(writeBuffer.front().data(),
@@ -76,7 +79,8 @@ void User::handle_write(const boost::system::error_code& error, size_t)
 	else
 	{
 		Logger::error("Write error for user: " + (nameSet ? name : "unnamed") + 
-					(error ? " - " + error.message() : ""), "User");
+					(error ? " - " + error.message() : "") + 
+					" (Queue size: " + std::to_string(writeBuffer.size()) + ")", "User");
 		chatRoom->removeUser(this);
 	}
 }
@@ -117,9 +121,23 @@ void User::handle_read(const boost::system::error_code& error, size_t)
 			return;
 		}
 
-		boost::asio::post(socket_.get_executor(), [this, line]() {
-    		chatRoom->deliverMessage(line + "\r\n", this);
-		});
+		// Создаем копию сообщения для асинхронной обработки
+		std::string message = line + "\r\n";
+		
+		// Проверяем состояние сокета перед асинхронной отправкой
+		if (socket_.is_open()) {
+			Logger::log("Socket is open, scheduling message delivery for user: " + name, "User");
+			boost::asio::post(socket_.get_executor(), [this, message]() {
+				if (socket_.is_open()) {
+					Logger::log("Executing async message delivery for user: " + name, "User");
+					chatRoom->deliverMessage(message, this);
+				} else {
+					Logger::error("Socket closed during async message delivery for user: " + name, "User");
+				}
+			});
+		} else {
+			Logger::error("Socket closed before scheduling message delivery for user: " + name, "User");
+		}
 
 		readMsg();
 	}

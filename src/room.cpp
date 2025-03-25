@@ -43,7 +43,7 @@ void Room::deliverMessage(std::string msg, User* sender) {
 	std::lock_guard<std::mutex> lock(roomMutex);
 	int deliveredCount = 0;
 	for (User* user : usersInRoom) {
-		if (user && user != sender) {
+		if (user && user != sender && user->getSocket().is_open()) {
 			user->queueMsg(msg);
 			deliveredCount++;
 		}

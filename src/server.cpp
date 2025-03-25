@@ -146,19 +146,31 @@ void Server::waitForConnection() {
         if (!is_running) return;
         
         User* ptr = User::getPointer(io_service, room);
-        accept.async_accept(ptr->getSocket(), boost::bind(&Server::acceptHandler, this, boost::asio::placeholders::error, ptr));
+        accept.async_accept(ptr->getSocket(), 
+                [this, ptr](const boost::system::error_code& ec) {
+                        if (!ec) {
+                                acceptHandler(ec, ptr);
+                        } else {
+                                delete ptr;
+                        }
+                });
 }
 
 void Server::acceptHandler(const boost::system::error_code& ec, User* ptr) {
         if (!is_running) {
                 ptr->disconnect();
+                delete ptr;
                 return;
         }
         
         ptr->queueMsg("Welcome to the chat server!\r\n");
         ptr->queueMsg("Please enter your nickname: ");
         ptr->readMsg();
-        waitForConnection();
+        
+        // Запускаем ожидание следующего подключения только после успешной обработки текущего
+        boost::asio::post(io_service, [this]() {
+                waitForConnection();
+        });
 }
 
 // health check от сервера для клиентов

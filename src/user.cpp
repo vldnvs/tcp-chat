@@ -1,56 +1,90 @@
 #include "user.h"
+#include "logger.h"
 
 
 void User::queueMsg(std::string msg) {
-		// Убеждаемся, что сообщение заканчивается на \r\n
-		if (msg.length() < 2 || msg.substr(msg.length() - 2) != "\r\n") {
-			msg += "\r\n";
-		}
-		
-		writeBuffer.push_back(msg);
-		boost::asio::async_write
+	if (!socket_.is_open()) {
+		Logger::error("Attempt to queue message to closed socket", "User");
+		return;
+	}
+
+	// Убеждаемся, что сообщение заканчивается на \r\n
+	if (msg.length() < 2 || msg.substr(msg.length() - 2) != "\r\n") {
+		msg += "\r\n";
+	}
+	
+	writeBuffer.push_back(msg);
+	Logger::log("Message queued for user: " + (nameSet ? name : "unnamed"), "User");
+	
+	boost::asio::async_write
+	(
+		socket_,
+		boost::asio::buffer(writeBuffer.front().data(), writeBuffer.front().length()),
+		boost::bind
 		(
-			socket_,
-			boost::asio::buffer(writeBuffer.front().data(), writeBuffer.front().length()),
-			boost::bind
-			(
-				&User::handle_write,
-				this,
-				boost::asio::placeholders::error,
-				boost::asio::placeholders::bytes_transferred
-			)
-		);
+			&User::handle_write,
+			this,
+			boost::asio::placeholders::error,
+			boost::asio::placeholders::bytes_transferred
+		)
+	);
 }
 
  
 void User::readMsg() {
-	boost::asio::async_read_until(socket_, readBuffer, '\n', boost::bind(&User::handle_read, this, boost::asio::placeholders::error, boost::asio::placeholders::bytes_transferred));
+	if (!socket_.is_open()) {
+		Logger::error("Attempt to read from closed socket", "User");
+		return;
+	}
+
+	Logger::log("Starting async read for user: " + (nameSet ? name : "unnamed"), "User");
+	boost::asio::async_read_until(
+		socket_, 
+		readBuffer, 
+		'\n', 
+		boost::bind(
+			&User::handle_read, 
+			this, 
+			boost::asio::placeholders::error, 
+			boost::asio::placeholders::bytes_transferred
+		)
+	);
 }
 
 
 void User::handle_write(const boost::system::error_code& error, size_t)
 {
-	if (!error)
+	if (!error && socket_.is_open())
 	{
 		writeBuffer.pop_front();
+		Logger::log("Message sent to user: " + (nameSet ? name : "unnamed"), "User");
+		
 		if (!writeBuffer.empty())
 		{
-			boost::asio::async_write(socket_,
+			boost::asio::async_write(
+				socket_,
 				boost::asio::buffer(writeBuffer.front().data(),
 					writeBuffer.front().length()),
-				boost::bind(&User::handle_write,this,
-					boost::asio::placeholders::error, boost::asio::placeholders::bytes_transferred));
+				boost::bind(
+					&User::handle_write,
+					this,
+					boost::asio::placeholders::error, 
+					boost::asio::placeholders::bytes_transferred
+				)
+			);
 		}
 	}
 	else
 	{
+		Logger::error("Write error for user: " + (nameSet ? name : "unnamed") + 
+					(error ? " - " + error.message() : ""), "User");
 		chatRoom->removeUser(this);
 	}
 }
 
 void User::handle_read(const boost::system::error_code& error, size_t)
 {
-	if (!error)
+	if (!error && socket_.is_open())
 	{
 		std::istream is(&readBuffer);
 		std::string line;
@@ -62,15 +96,17 @@ void User::handle_read(const boost::system::error_code& error, size_t)
 		line.erase(std::remove(line.begin(), line.end(), ' '), line.end());
 		
 		if (line.empty()) {
+			Logger::log("Empty message received from user: " + (nameSet ? name : "unnamed"), "User");
 			readMsg();
 			return;
 		}
 		
-		std::cout << "Received: " << line << std::endl;
+		Logger::log("Message received from user: " + (nameSet ? name : "unnamed") + " - " + line, "User");
 		
 		if (!nameSet) {
 			name = line;
 			nameSet = true;
+			Logger::log("User set name: " + name, "User");
 			readMsg();
 			return;
 		}
@@ -79,17 +115,21 @@ void User::handle_read(const boost::system::error_code& error, size_t)
 		if (line == "PONG") {
 			waitingForPong = false;
 			uptime = clock_::now();
+			Logger::log("PONG received from user: " + name, "User");
 			readMsg();
 			return;
 		}
 
-		boost::asio::post(socket_.get_executor(), [this, line]() {
+		// Используем io_service вместо get_executor
+		boost::asio::post(socket_.get_io_service(), [this, line]() {
 			chatRoom->deliverMessage(line + "\r\n", this);
 		});
 
 		readMsg();
 	}
 	else {
+		Logger::error("Read error for user: " + (nameSet ? name : "unnamed") + 
+					(error ? " - " + error.message() : ""), "User");
 		chatRoom->removeUser(this);
 	}
 }

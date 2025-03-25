@@ -14,6 +14,7 @@ set(SOURCES
     src/user.cpp
     src/server.cpp
     src/room.cpp
+    src/logger/logger.cpp
 )
 
 set(HEADERS
@@ -44,6 +45,7 @@ if(BUILD_TESTS)
         src/user.cpp
         src/server.cpp
         src/room.cpp
+        src/logger/logger.cpp
     )
     
     add_executable(chat_tests ${TEST_SOURCES} ${HEADERS})

@@ -8,7 +8,6 @@ void User::queueMsg(std::string msg) {
 		return;
 	}
 
-	// Убеждаемся, что сообщение заканчивается на \r\n
 	if (msg.length() < 2 || msg.substr(msg.length() - 2) != "\r\n") {
 		msg += "\r\n";
 	}
@@ -90,7 +89,6 @@ void User::handle_read(const boost::system::error_code& error, size_t)
 		std::string line;
 		std::getline(is, line);
 		
-		// Удаляем все символы конца строки и пробелы
 		line.erase(std::remove(line.begin(), line.end(), '\r'), line.end());
 		line.erase(std::remove(line.begin(), line.end(), '\n'), line.end());
 		line.erase(std::remove(line.begin(), line.end(), ' '), line.end());
@@ -111,7 +109,6 @@ void User::handle_read(const boost::system::error_code& error, size_t)
 			return;
 		}
 
-		// Обработка PONG сообщения
 		if (line == "PONG") {
 			waitingForPong = false;
 			uptime = clock_::now();
@@ -120,9 +117,8 @@ void User::handle_read(const boost::system::error_code& error, size_t)
 			return;
 		}
 
-		// Используем io_service вместо get_executor
-		boost::asio::post(socket_.get_io_service(), [this, line]() {
-			chatRoom->deliverMessage(line + "\r\n", this);
+		boost::asio::post(socket_.get_executor(), [this, line]() {
+    		chatRoom->deliverMessage(line + "\r\n", this);
 		});
 
 		readMsg();

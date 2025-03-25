@@ -3,8 +3,6 @@
 #include "logger.h"
 #include <algorithm>
 
-extern std::vector<User*> usersInRoom;
-
 void Room::addUser(User* user) {
 	if (!user) {
 		Logger::error("Attempt to add null user", "Room");

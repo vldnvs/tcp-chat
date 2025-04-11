@@ -129,6 +129,7 @@ void User::handle_read(const boost::system::error_code& error, size_t)
 		if (socket_.is_open()) {
 			Logger::log("Socket is open, scheduling message delivery for user: " + name, "User");
 			boost::asio::post(socket_.get_executor(), [this, message]() {
+				// ToDO: исправить костыль
 				if (socket_.is_open()) {
 					Logger::log("Executing async message delivery for user: " + name, "User");
 					chatRoom->deliverMessage(message, this);

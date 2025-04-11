@@ -18,7 +18,6 @@ Server::~Server() {
         Logger::log("Server shutting down...", "Server");
         stop();
         
-        // Ждем завершения всех потоков
         for (auto& thread : thread_pool) {
                 if (thread.joinable()) {
                         thread.join();
@@ -198,12 +197,10 @@ void Server::acceptHandler(const boost::system::error_code& ec, User* ptr) {
                 ptr->queueMsg("Welcome to the chat server!\r\n");
                 ptr->queueMsg("Please enter your nickname: ");
                 
-                // Запускаем чтение сообщений
                 boost::asio::post(io_service, [ptr]() {
                         ptr->readMsg();
                 });
                 
-                // Запускаем ожидание следующего подключения только после успешной обработки текущего
                 boost::asio::post(io_service, [this]() {
                         waitForConnection();
                 });
@@ -214,8 +211,3 @@ void Server::acceptHandler(const boost::system::error_code& ec, User* ptr) {
                 throw;
         }
 }
-
-// health check от сервера для клиентов
-// использовать thread pool  
-// доделать асинхронность
-// тесты

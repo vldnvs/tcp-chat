@@ -1,5 +1,3 @@
-cmake_minimum_required (VERSION 2.6)
-project (Chat)
 cmake_minimum_required(VERSION 3.10)
 project(ChatApp)
 
@@ -23,7 +21,6 @@ set(HEADERS
     headers/room.h
 )
 
-
 find_package(Boost REQUIRED COMPONENTS system thread regex unit_test_framework)
 if(Boost_FOUND)
     include_directories(${Boost_INCLUDE_DIRS})
@@ -40,15 +37,19 @@ option(BUILD_TESTS "Build the tests" ON)
 if(BUILD_TESTS)
     enable_testing()
     
-    set(TEST_SOURCES
-        tests/chat_tests.cpp
-        src/user.cpp
-        src/server.cpp
-        src/room.cpp
-        src/logger/logger.cpp
-    )
-    
-    add_executable(chat_tests ${TEST_SOURCES} ${HEADERS})
-    target_link_libraries(chat_tests Boost::system Boost::thread Boost::regex Boost::unit_test_framework)
-    add_test(NAME ChatTests COMMAND chat_tests)
+    if(EXISTS ${CMAKE_SOURCE_DIR}/tests/chat_tests.cpp)
+        set(TEST_SOURCES
+            tests/chat_tests.cpp
+            src/user.cpp
+            src/server.cpp
+            src/room.cpp
+            src/logger/logger.cpp
+        )
+        
+        add_executable(chat_tests ${TEST_SOURCES} ${HEADERS})
+        target_link_libraries(chat_tests Boost::system Boost::thread Boost::regex Boost::unit_test_framework)
+        add_test(NAME ChatTests COMMAND chat_tests)
+    else()
+        message(WARNING "Test file tests/chat_tests.cpp not found. Tests will not be built.")
+    endif()
 endif()

@@ -2,9 +2,11 @@
 #define SERVERADDRESSWINDOW_H
 
 #include <QDialog>
+#include "networkManager.h"
 
 class QLineEdit;
 class QPushButton;
+class QLabel;
 
 class ServerAddressWindow : public QDialog
 {
@@ -12,17 +14,22 @@ class ServerAddressWindow : public QDialog
 
 public:
     explicit ServerAddressWindow(QWidget *parent = nullptr);
+    ~ServerAddressWindow();
 
 signals:
-    void accepted(const QString &host, quint16 port);
+    void connectionEstablished();
 
 private slots:
     void onConnectClicked();
+    void onConnectionError(const QString &error);
+    void onConnectionSuccess();
 
 private:
     QLineEdit *ipEdit;
     QLineEdit *portEdit;
     QPushButton *connectButton;
+    QLabel *statusLabel;
+    NetworkManager *networkManager;
 };
 
 #endif // SERVERADDRESSWINDOW_H

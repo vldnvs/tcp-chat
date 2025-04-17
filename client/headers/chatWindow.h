@@ -2,7 +2,7 @@
 #define CHATWINDOW_H
 
 #include <QMainWindow>
-#include <QTcpSocket>
+#include "networkManager.h"
 
 class QTextEdit;
 class QLineEdit;
@@ -14,32 +14,26 @@ class ChatWindow : public QMainWindow
     Q_OBJECT
 
 public:
-    explicit ChatWindow(const QString &username, const QString &host, quint16 port, QWidget *parent = nullptr);
+    explicit ChatWindow(const QString &username, NetworkManager *networkManager, QWidget *parent = nullptr);
     ~ChatWindow();
-
-signals:
-    void sendMessage(const QString &message);
 
 private slots:
     void onSendClicked();
-    void onMessageReceived();
-    void onConnected();
+    void onMessageReceived(const QString &message);
+    void onConnectionError(const QString &error);
     void onDisconnected();
-    void onError(QAbstractSocket::SocketError socketError);
 
 private:
-    void connectToServer();
     void displayMessage(const QString &message);
+    void sendChatMessage(const QString &message);
 
-    QTcpSocket *socket;
+    NetworkManager *networkManager;
     QTextEdit *chatView;
     QLineEdit *messageEdit;
     QPushButton *sendButton;
     QListWidget *usersList;
 
     QString currentUsername;
-    QString serverHost;
-    quint16 serverPort;
 };
 
 #endif // CHATWINDOW_H

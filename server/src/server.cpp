@@ -109,52 +109,34 @@ void Server::healthCheck() {
 }
 
 void Server::monitor() {
-        Logger::log("Starting command monitor", "Server");
-        boost::asio::posix::stream_descriptor input(io_service, ::dup(STDIN_FILENO));
+    Logger::log("Starting command monitor", "Server");
+    
+    std::string line;
+    std::cout << ">> ";
+    
+    while (is_running && std::getline(std::cin, line)) {
+        Logger::log("Command received: " + line, "Server");
         
-        std::function<void(boost::asio::streambuf&)> asyncReadLine;
-        asyncReadLine = [this, &input, &asyncReadLine](boost::asio::streambuf& buffer) {
-                boost::asio::async_read_until(
-                        input, 
-                        buffer, 
-                        '\n',
-                        [this, &input, &buffer, &asyncReadLine](const boost::system::error_code& ec, std::size_t size) {
-                                if (!ec && is_running) {
-                                        std::istream is(&buffer);
-                                        std::string line;
-                                        std::getline(is, line);
-                                        
-                                        Logger::log("Command received: " + line, "Server");
-                                        
-                                        if (line == "/show_uptime") {
-                                                auto uptime = std::chrono::duration<double>(clock_::now() - this->server_time).count();
-                                                std::cout << "Server uptime: " << uptime << " seconds" << std::endl;
-                                                std::cout << ">> ";
-                                                asyncReadLine(buffer);
-                                        }
-                                        else if (line == "/shutdown") {
-                                                Logger::log("Shutdown command received", "Server");
-                                                stop();
-                                                for (User* ptr : room->getUsers()) {
-                                                        ptr->disconnect();
-                                                }
-                                                input.close();
-                                                return;
-                                        }
-                                        else {
-                                                std::cout << "Unknown command. Available commands are: /show_uptime, /shutdown" << std::endl;
-                                                std::cout << ">> ";
-                                                asyncReadLine(buffer);
-                                        }
-                                }
-                        }
-                );
-        };
+        if (line == "/show_uptime") {
+            auto uptime = std::chrono::duration<double>(clock_::now() - this->server_time).count();
+            std::cout << "Server uptime: " << uptime << " seconds" << std::endl;
+        }
+        else if (line == "/shutdown") {
+            Logger::log("Shutdown command received", "Server");
+            stop();
+            for (User* ptr : room->getUsers()) {
+                ptr->disconnect();
+            }
+            break;
+        }
+        else {
+            std::cout << "Unknown command. Available commands are: /show_uptime, /shutdown" << std::endl;
+        }
         
-        std::cout << ">> ";
-        asyncReadLine(commandLineBuffer);
-        
-        io_service.run();
+        if (is_running) {
+            std::cout << ">> ";
+        }
+    }
 }
 
 void Server::waitForConnection() {

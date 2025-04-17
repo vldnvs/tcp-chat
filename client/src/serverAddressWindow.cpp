@@ -9,9 +9,10 @@
 
 ServerAddressWindow::ServerAddressWindow(QWidget *parent)
     : QDialog(parent)
+    , networkManager(new NetworkManager(this))
 {
     setWindowTitle("Connect to Server");
-    setFixedSize(300, 150);
+    setFixedSize(300, 200);
 
     // IP input
     ipEdit = new QLineEdit(this);
@@ -24,15 +25,29 @@ ServerAddressWindow::ServerAddressWindow(QWidget *parent)
     portEdit->setPlaceholderText("Port");
     portEdit->setValidator(new QIntValidator(1, 65535, this));
 
+    // Status label
+    statusLabel = new QLabel("Enter server address and port", this);
+    statusLabel->setAlignment(Qt::AlignCenter);
+
     // Connect button
     connectButton = new QPushButton("Connect", this);
     connect(connectButton, &QPushButton::clicked, this, &ServerAddressWindow::onConnectClicked);
+
+    // Connect network manager signals
+    connect(networkManager, &NetworkManager::errorOccurred, this, &ServerAddressWindow::onConnectionError);
+    connect(networkManager, &NetworkManager::connected, this, &ServerAddressWindow::onConnectionSuccess);
 
     // Layout
     QVBoxLayout *layout = new QVBoxLayout(this);
     layout->addWidget(ipEdit);
     layout->addWidget(portEdit);
+    layout->addWidget(statusLabel);
     layout->addWidget(connectButton);
+}
+
+ServerAddressWindow::~ServerAddressWindow()
+{
+    networkManager->disconnectFromServer();
 }
 
 void ServerAddressWindow::onConnectClicked()
@@ -52,6 +67,25 @@ void ServerAddressWindow::onConnectClicked()
         return;
     }
 
-    emit accepted(ip, port);
+    statusLabel->setText("Connecting...");
+    connectButton->setEnabled(false);
+
+    if (!networkManager->connectToServer(ip, port)) {
+        statusLabel->setText("Already connected");
+        connectButton->setEnabled(true);
+    }
+}
+
+void ServerAddressWindow::onConnectionError(const QString &error)
+{
+    statusLabel->setText("Connection failed");
+    QMessageBox::warning(this, "Connection Error", error);
+    connectButton->setEnabled(true);
+}
+
+void ServerAddressWindow::onConnectionSuccess()
+{
+    statusLabel->setText("Connected successfully");
+    emit connectionEstablished();
     accept();
 }

@@ -1,56 +1,44 @@
-#include "../headers/WindowManager.h"
-#include <QDebug>
+#include "../headers/windowManager.h"
+#include <QApplication>
 
 WindowManager::WindowManager(QObject *parent)
-    : QObject(parent), serverWindow(new ServerAddressWindow),
-      usernameWindow(new UsernameWindow), chatWindow(nullptr)
+    : QObject(parent)
+    , serverWindow(nullptr)
+    , usernameWindow(nullptr)
+    , chatWindow(nullptr)
+    , networkManager(new NetworkManager(this))
 {
-    // Подключаем сигналы первого окна к слоту обработки адреса сервера
-    connect(serverWindow, &ServerAddressWindow::accepted, this, &WindowManager::onServerAddressAccepted);
-
-    // Подключаем сигналы второго окна к слоту обработки имени пользователя
-    connect(usernameWindow, &UsernameWindow::accepted, this, &WindowManager::onUsernameAccepted);
 }
 
 WindowManager::~WindowManager()
 {
-    // Освобождаем ресурсы
     delete serverWindow;
     delete usernameWindow;
-    if (chatWindow) {
-        delete chatWindow;
-    }
+    delete chatWindow;
 }
 
 void WindowManager::showServerAddressWindow()
 {
-    // Показываем первое окно (ввод адреса сервера)
-    serverWindow->exec();
+    serverWindow = new ServerAddressWindow();
+    connect(serverWindow, &ServerAddressWindow::connectionEstablished, this, &WindowManager::onServerAddressAccepted);
+    serverWindow->show();
 }
 
-void WindowManager::onServerAddressAccepted(const QString &host, quint16 port)
+void WindowManager::onServerAddressAccepted()
 {
-    qDebug() << "Server address accepted:" << host << ":" << port;
+    serverWindow->deleteLater();
+    serverWindow = nullptr;
 
-    // Передаем данные в окно ввода имени через свойства
-    usernameWindow->setProperty("host", host);
-    usernameWindow->setProperty("port", port);
-
-    // Показываем второе окно (ввод имени пользователя)
-    usernameWindow->exec();
+    usernameWindow = new UsernameWindow();
+    connect(usernameWindow, &UsernameWindow::accepted, this, &WindowManager::onUsernameAccepted);
+    usernameWindow->show();
 }
 
 void WindowManager::onUsernameAccepted(const QString &username)
 {
-    qDebug() << "Username accepted:" << username;
+    usernameWindow->deleteLater();
+    usernameWindow = nullptr;
 
-    // Получаем ранее сохраненные данные о сервере
-    QString host = usernameWindow->property("host").toString();
-    quint16 port = usernameWindow->property("port").toUInt();
-
-    // Создаем и показываем окно чата
-    chatWindow = new ChatWindow(username, host, port);
-
-    // Показываем окно чата
+    chatWindow = new ChatWindow(username, networkManager);
     chatWindow->show();
 }

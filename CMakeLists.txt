@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.10)
-project(ChatApp)
+project(TCPChat)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -22,6 +22,8 @@ set(HEADERS
 )
 
 find_package(Boost REQUIRED COMPONENTS system thread regex unit_test_framework)
+find_package(Qt6 COMPONENTS Core Gui Widgets REQUIRED)
+
 if(Boost_FOUND)
     include_directories(${Boost_INCLUDE_DIRS})
     message(STATUS "Boost found: ${Boost_INCLUDE_DIRS}")
@@ -53,3 +55,6 @@ if(BUILD_TESTS)
         message(WARNING "Test file tests/chat_tests.cpp not found. Tests will not be built.")
     endif()
 endif()
+
+add_subdirectory(server)
+add_subdirectory(client)

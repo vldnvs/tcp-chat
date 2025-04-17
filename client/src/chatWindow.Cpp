@@ -1,119 +1,115 @@
 #include "../headers/chatWindow.h"
 #include <QVBoxLayout>
 #include <QHBoxLayout>
-#include <QSplitter>
+#include <QTextEdit>
+#include <QLineEdit>
+#include <QPushButton>
+#include <QListWidget>
 #include <QMessageBox>
 
-ChatWindow::ChatWindow(const QString &username, const QString &host, quint16 port, QWidget *parent)
-    : QMainWindow(parent), currentUsername(username), serverHost(host), serverPort(port)
+ChatWindow::ChatWindow(const QString &username, NetworkManager *networkManager, QWidget *parent)
+    : QMainWindow(parent)
+    , networkManager(networkManager)
+    , currentUsername(username)
 {
-    setWindowTitle("Chat Room - " + username);
-    setMinimumSize(800, 600);
+    setWindowTitle("Chat - " + username);
+    setMinimumSize(600, 400);
 
-    // Создаем виджеты
+    // Chat view
     chatView = new QTextEdit(this);
     chatView->setReadOnly(true);
-    chatView->setStyleSheet("background: #4a3a3a; border-radius: 8px; padding: 10px;");
 
+    // Message input
     messageEdit = new QLineEdit(this);
     messageEdit->setPlaceholderText("Type your message...");
-    messageEdit->setStyleSheet("background: #4a3a3a; border-radius: 8px; padding: 8px; margin: 5px 0;");
 
+    // Send button
     sendButton = new QPushButton("Send", this);
-    sendButton->setStyleSheet("padding: 8px 16px;");
-
-    usersList = new QListWidget(this);
-    usersList->setStyleSheet("background: #4a3a3a; border-radius: 8px;");
-
-    // Левая панель (чат)
-    QWidget *leftPanel = new QWidget(this);
-    QVBoxLayout *leftLayout = new QVBoxLayout(leftPanel);
-    leftLayout->addWidget(chatView);
-    leftLayout->addWidget(messageEdit);
-    leftLayout->addWidget(sendButton);
-    leftLayout->setSpacing(5);
-    leftLayout->setContentsMargins(10, 10, 10, 10);
-
-    // Разделитель
-    QSplitter *splitter = new QSplitter(Qt::Horizontal, this);
-    splitter->addWidget(leftPanel);
-    splitter->addWidget(usersList);
-    splitter->setSizes({600, 200});
-    splitter->setStyleSheet("QSplitter::handle { background: #5c4b4b; }");
-
-    // Основной layout
-    QVBoxLayout *mainLayout = new QVBoxLayout();
-    mainLayout->addWidget(splitter);
-    mainLayout->setContentsMargins(0, 0, 0, 0);
-
-    QWidget *centralWidget = new QWidget(this);
-    centralWidget->setLayout(mainLayout);
-    setCentralWidget(centralWidget);
-
-    // Подключаем события
     connect(sendButton, &QPushButton::clicked, this, &ChatWindow::onSendClicked);
     connect(messageEdit, &QLineEdit::returnPressed, this, &ChatWindow::onSendClicked);
 
-    // Инициализация сокета
-    socket = new QTcpSocket(this);
-    connect(socket, &QTcpSocket::readyRead, this, &ChatWindow::onMessageReceived);
-    connect(socket, &QTcpSocket::connected, this, &ChatWindow::onConnected);
-    connect(socket, QOverload<QAbstractSocket::SocketError>::of(&QAbstractSocket::errorOccurred),
-            this, &ChatWindow::onError);
+    // Users list
+    usersList = new QListWidget(this);
+    usersList->setMaximumWidth(150);
 
-    // Подключение к серверу
-    connectToServer();
+    // Connect network manager signals
+    connect(networkManager, &NetworkManager::messageReceived, this, &ChatWindow::onMessageReceived);
+    connect(networkManager, &NetworkManager::errorOccurred, this, &ChatWindow::onConnectionError);
+    connect(networkManager, &NetworkManager::disconnected, this, &ChatWindow::onDisconnected);
+
+    // Layout
+    QWidget *centralWidget = new QWidget(this);
+    setCentralWidget(centralWidget);
+
+    QHBoxLayout *mainLayout = new QHBoxLayout(centralWidget);
+    QVBoxLayout *chatLayout = new QVBoxLayout();
+
+    QHBoxLayout *inputLayout = new QHBoxLayout();
+    inputLayout->addWidget(messageEdit);
+    inputLayout->addWidget(sendButton);
+
+    chatLayout->addWidget(chatView);
+    chatLayout->addLayout(inputLayout);
+
+    mainLayout->addLayout(chatLayout, 1);
+    mainLayout->addWidget(usersList);
+
+    // Send initial join message
+    sendChatMessage("JOIN " + username);
 }
 
 ChatWindow::~ChatWindow()
 {
-    if (socket->state() == QAbstractSocket::ConnectedState) {
-        socket->disconnectFromHost();
+    if (networkManager->isConnected()) {
+        sendChatMessage("LEAVE " + currentUsername);
     }
-}
-
-void ChatWindow::connectToServer()
-{
-    socket->connectToHost(serverHost, serverPort);
-    displayMessage("Connecting to server...");
 }
 
 void ChatWindow::onSendClicked()
 {
     QString message = messageEdit->text().trimmed();
     if (!message.isEmpty()) {
-        socket->write(QString("%1: %2\n").arg(currentUsername, message).toUtf8());
+        sendChatMessage("MSG " + currentUsername + ": " + message);
         messageEdit->clear();
     }
 }
 
-void ChatWindow::onMessageReceived()
+void ChatWindow::onMessageReceived(const QString &message)
 {
-    while (socket->canReadLine()) {
-        QString message = QString::fromUtf8(socket->readLine()).trimmed();
-        displayMessage(message);
+    if (message.startsWith("MSG ")) {
+        displayMessage(message.mid(4));
+    } else if (message.startsWith("JOIN ")) {
+        QString username = message.mid(5);
+        usersList->addItem(username);
+        displayMessage(username + " joined the chat");
+    } else if (message.startsWith("LEAVE ")) {
+        QString username = message.mid(6);
+        QList<QListWidgetItem*> items = usersList->findItems(username, Qt::MatchExactly);
+        for (QListWidgetItem *item : items) {
+            delete item;
+        }
+        displayMessage(username + " left the chat");
     }
 }
 
-void ChatWindow::onConnected()
+void ChatWindow::onConnectionError(const QString &error)
 {
-    displayMessage("Connected to server!");
-    socket->write(QString("USERNAME:%1\n").arg(currentUsername).toUtf8()); // Отправляем имя пользователя
+    QMessageBox::critical(this, "Connection Error", error);
+    close();
 }
 
 void ChatWindow::onDisconnected()
 {
-    displayMessage("Disconnected from server.");
-}
-
-void ChatWindow::onError(QAbstractSocket::SocketError socketError)
-{
-    Q_UNUSED(socketError);
-    QMessageBox::critical(this, "Error", socket->errorString());
+    QMessageBox::information(this, "Disconnected", "Connection to server lost");
+    close();
 }
 
 void ChatWindow::displayMessage(const QString &message)
 {
     chatView->append(message);
-    chatView->verticalScrollBar()->setValue(chatView->verticalScrollBar()->maximum());
+}
+
+void ChatWindow::sendChatMessage(const QString &message)
+{
+    networkManager->sendMessage(message);
 }

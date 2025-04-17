@@ -1,0 +1,59 @@
+QDialog {
+    background: #2d2424;  /* Темно-коричневый фон */
+    color: #f5e0d7;       /* Бежевый текст */
+    font-family: "Segoe UI", sans-serif;
+    border-radius: 10px;
+}
+
+QLineEdit {
+    background: #4a3a3a;
+    border: 2px solid #6d5d5d;
+    border-radius: 8px;
+    padding: 8px;
+    color: #f5e0d7;
+    font-size: 14px;
+}
+
+QPushButton {
+    background: #5c4b4b;
+    border: none;
+    border-radius: 8px;
+    padding: 10px 20px;
+    color: #f5e0d7;
+    font-weight: bold;
+    margin: 5px 0;
+}
+
+QPushButton:hover {
+    background: #7a6969;
+}
+
+QPushButton:pressed {
+    background: #3d2e2e;
+}
+
+QTextEdit {
+    background: #4a3a3a;
+    border: 2px solid #6d5d5d;
+    border-radius: 8px;
+    color: #f5e0d7;
+    font-size: 14px;
+}
+
+QListWidget {
+    background: #4a3a3a;
+    border: 2px solid #6d5d5d;
+    border-radius: 8px;
+    color: #f5e0d7;
+    font-size: 14px;
+    outline: 0;
+}
+
+QListWidget::item {
+    padding: 8px;
+    border-bottom: 1px solid #5c4b4b;
+}
+
+QListWidget::item:selected {
+    background: #6d5d5d;
+}

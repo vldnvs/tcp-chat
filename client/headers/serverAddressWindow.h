@@ -1,35 +1,26 @@
 #ifndef SERVERADDRESSWINDOW_H
 #define SERVERADDRESSWINDOW_H
 
-#include <QDialog>
-#include "networkManager.h"
+#include <QMainWindow>
+#include <QLineEdit>
+#include <QLabel>
 
-class QLineEdit;
-class QPushButton;
-class QLabel;
-
-class ServerAddressWindow : public QDialog
+class ServerAddressWindow : public QMainWindow
 {
     Q_OBJECT
 
 public:
     explicit ServerAddressWindow(QWidget *parent = nullptr);
-    ~ServerAddressWindow();
 
 signals:
-    void connectionEstablished();
+    void serverAddressAccepted(const QString &ip, quint16 port);
 
 private slots:
     void onConnectClicked();
-    void onConnectionError(const QString &error);
-    void onConnectionSuccess();
 
 private:
     QLineEdit *ipEdit;
     QLineEdit *portEdit;
-    QPushButton *connectButton;
-    QLabel *statusLabel;
-    NetworkManager *networkManager;
 };
 
 #endif // SERVERADDRESSWINDOW_H

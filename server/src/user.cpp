@@ -108,14 +108,6 @@ void User::handle_read(const boost::system::error_code& error, size_t)
 		
 		Logger::log("Message received from user: " + (nameSet ? name : "unnamed") + " - " + line, "User");
 		
-		if (!nameSet) {
-			name = line;
-			nameSet = true;
-			Logger::log("User set name: " + name, "User");
-			readMsg();
-			return;
-		}
-
 		if (line == "PONG") {
 			waitingForPong = false;
 			uptime = clock_::now();
@@ -124,28 +116,51 @@ void User::handle_read(const boost::system::error_code& error, size_t)
 			return;
 		}
 
-		std::string message = name + ": " + line + "\r\n";
+		// Process the message
+		handleMessage(line);
 		
-		if (socket_.is_open()) {
-			Logger::log("Socket is open, scheduling message delivery for user: " + name, "User");
-			boost::asio::post(socket_.get_executor(), [this, message]() {
-				if (socket_.is_open()) {
-					Logger::log("Executing async message delivery for user: " + name, "User");
-					chatRoom->deliverMessage(message, this);
-				} else {
-					Logger::error("Socket closed during async message delivery for user: " + name, "User");
-				}
-			});
-		} else {
-			Logger::error("Socket closed before scheduling message delivery for user: " + name, "User");
-		}
-
+		// Continue reading
 		readMsg();
 	}
 	else {
 		Logger::error("Read error for user: " + (nameSet ? name : "unnamed") + 
 					(error ? " - " + error.message() : ""), "User");
 		chatRoom->removeUser(this);
+	}
+}
+
+void User::handleMessage(const std::string& message) {
+	if (!nameSet) {
+		// Handle nickname setting
+		name = message;
+		nameSet = true;
+		Logger::log("User set name: " + name, "User");
+		chatRoom->addUser(this);
+		return;
+	}
+	
+	// Handle commands
+	if (message == "LIST") {
+		chatRoom->broadcastUserList();
+	}
+	else if (message == "HISTORY") {
+		chatRoom->sendHistory(this);
+	}
+	else if (message.substr(0, 4) == "MSG ") {
+		// Handle chat message
+		std::string chatMsg = name + ": " + message.substr(4);  // Remove "MSG " prefix
+		chatRoom->deliverMessage(chatMsg, this);
+	}
+	else if (message.substr(0, 5) == "JOIN ") {
+		// Handle join message (already handled in nickname setting)
+		return;
+	}
+	else if (message.substr(0, 6) == "LEAVE ") {
+		// Handle leave message
+		std::string leaveMsg = name + " left the chat";
+		chatRoom->deliverMessage(leaveMsg, this);
+		chatRoom->removeUser(this);
+		disconnect();
 	}
 }
 

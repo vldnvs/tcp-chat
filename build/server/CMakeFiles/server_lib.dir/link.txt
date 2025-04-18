@@ -1,0 +1,2 @@
+/usr/bin/ar qc ../lib/libserver_lib.a CMakeFiles/server_lib.dir/src/logger.cpp.o CMakeFiles/server_lib.dir/src/main.cpp.o CMakeFiles/server_lib.dir/src/room.cpp.o CMakeFiles/server_lib.dir/src/server.cpp.o CMakeFiles/server_lib.dir/src/user.cpp.o
+/usr/bin/ranlib ../lib/libserver_lib.a

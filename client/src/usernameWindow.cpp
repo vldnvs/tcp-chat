@@ -1,38 +1,40 @@
-#include "../headers/UsernameWindow.h"
+#include "../headers/usernameWindow.h"
 #include <QVBoxLayout>
-#include <QRegExpValidator>
-#include <QMessageBox>
+#include <QRegularExpressionValidator>
+#include <QLabel>
+#include <QPushButton>
 
 UsernameWindow::UsernameWindow(QWidget *parent)
-    : QDialog(parent)
+    : QMainWindow(parent)
 {
-    setWindowTitle("Enter Your Name");
-    setFixedSize(300, 100);
+    setWindowTitle("Enter Username");
+    setFixedSize(300, 150);
 
-    // Name input
-    nameEdit = new QLineEdit(this);
-    nameEdit->setPlaceholderText("Your name");
-    nameEdit->setMaxLength(20);
-    nameEdit->setValidator(new QRegExpValidator(QRegExp("[A-Za-z0-9_]+"), this));
+    QWidget *centralWidget = new QWidget(this);
+    setCentralWidget(centralWidget);
 
-    // Continue button
-    continueButton = new QPushButton("Continue", this);
-    connect(continueButton, &QPushButton::clicked, this, &UsernameWindow::onContinueClicked);
+    QVBoxLayout *mainLayout = new QVBoxLayout(centralWidget);
 
-    // Layout
-    QVBoxLayout *layout = new QVBoxLayout(this);
-    layout->addWidget(nameEdit);
-    layout->addWidget(continueButton);
+    QLabel *label = new QLabel("Enter your username:", this);
+    usernameEdit = new QLineEdit(this);
+    usernameEdit->setPlaceholderText("Username");
+
+    // Валидатор для имени пользователя (буквы, цифры, подчеркивания)
+    QRegularExpression regex("^[a-zA-Z0-9_]{3,16}$");
+    usernameEdit->setValidator(new QRegularExpressionValidator(regex, this));
+
+    QPushButton *okButton = new QPushButton("OK", this);
+    connect(okButton, &QPushButton::clicked, this, &UsernameWindow::onOkClicked);
+
+    mainLayout->addWidget(label);
+    mainLayout->addWidget(usernameEdit);
+    mainLayout->addWidget(okButton);
 }
 
-void UsernameWindow::onContinueClicked()
+void UsernameWindow::onOkClicked()
 {
-    QString username = nameEdit->text().trimmed();
-    if (username.isEmpty()) {
-        QMessageBox::warning(this, "Error", "Name cannot be empty");
-        return;
+    QString username = usernameEdit->text();
+    if (!username.isEmpty()) {
+        emit usernameAccepted(username);
     }
-
-    emit accepted(username);
-    accept();
 }

@@ -1,91 +1,88 @@
 #include "../headers/serverAddressWindow.h"
+#include "../headers/logger.h"
 #include <QVBoxLayout>
 #include <QHBoxLayout>
 #include <QLabel>
 #include <QLineEdit>
 #include <QPushButton>
-#include <QRegExpValidator>
+#include <QRegularExpressionValidator>
 #include <QMessageBox>
+#include <iostream>
 
 ServerAddressWindow::ServerAddressWindow(QWidget *parent)
-    : QDialog(parent)
-    , networkManager(new NetworkManager(this))
+    : QMainWindow(parent)
 {
-    setWindowTitle("Connect to Server");
-    setFixedSize(300, 200);
+    std::cout << "Initializing ServerAddressWindow..." << std::endl;
+    
+    setWindowTitle("Enter Server Address");
+    setFixedSize(400, 150);
 
-    // IP input
+    QWidget *centralWidget = new QWidget(this);
+    setCentralWidget(centralWidget);
+
+    QVBoxLayout *mainLayout = new QVBoxLayout(centralWidget);
+
+    // IP address input
+    QHBoxLayout *ipLayout = new QHBoxLayout();
+    QLabel *ipLabel = new QLabel("IP Address:", this);
     ipEdit = new QLineEdit(this);
-    ipEdit->setPlaceholderText("IP Address");
-    QRegExp ipRegex("^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$");
-    ipEdit->setValidator(new QRegExpValidator(ipRegex, this));
+    ipEdit->setPlaceholderText("Enter IP address or hostname");
+    QRegularExpression ipRegex("^(localhost|(?:[0-9]{1,3}\\.){3}[0-9]{1,3})$");
+    ipEdit->setValidator(new QRegularExpressionValidator(ipRegex, this));
+    ipLayout->addWidget(ipLabel);
+    ipLayout->addWidget(ipEdit);
+    
+    // Устанавливаем значение по умолчанию
+    ipEdit->setText("localhost");
 
     // Port input
+    QHBoxLayout *portLayout = new QHBoxLayout();
+    QLabel *portLabel = new QLabel("Port:", this);
     portEdit = new QLineEdit(this);
-    portEdit->setPlaceholderText("Port");
-    portEdit->setValidator(new QIntValidator(1, 65535, this));
-
-    // Status label
-    statusLabel = new QLabel("Enter server address and port", this);
-    statusLabel->setAlignment(Qt::AlignCenter);
+    portEdit->setPlaceholderText("Enter port number");
+    QRegularExpression portRegex("^[0-9]{1,5}$");
+    portEdit->setValidator(new QRegularExpressionValidator(portRegex, this));
+    portLayout->addWidget(portLabel);
+    portLayout->addWidget(portEdit);
+    
+    // Устанавливаем значение по умолчанию
+    portEdit->setText("13");
 
     // Connect button
-    connectButton = new QPushButton("Connect", this);
+    QPushButton *connectButton = new QPushButton("Connect", this);
     connect(connectButton, &QPushButton::clicked, this, &ServerAddressWindow::onConnectClicked);
 
-    // Connect network manager signals
-    connect(networkManager, &NetworkManager::errorOccurred, this, &ServerAddressWindow::onConnectionError);
-    connect(networkManager, &NetworkManager::connected, this, &ServerAddressWindow::onConnectionSuccess);
-
-    // Layout
-    QVBoxLayout *layout = new QVBoxLayout(this);
-    layout->addWidget(ipEdit);
-    layout->addWidget(portEdit);
-    layout->addWidget(statusLabel);
-    layout->addWidget(connectButton);
-}
-
-ServerAddressWindow::~ServerAddressWindow()
-{
-    networkManager->disconnectFromServer();
+    mainLayout->addLayout(ipLayout);
+    mainLayout->addLayout(portLayout);
+    mainLayout->addWidget(connectButton);
+    
+    std::cout << "ServerAddressWindow initialization complete" << std::endl;
+    
+    // Делаем активным поле IP-адреса при запуске
+    ipEdit->setFocus();
 }
 
 void ServerAddressWindow::onConnectClicked()
 {
+    std::cout << "Connect button clicked" << std::endl;
+    
     QString ip = ipEdit->text();
     QString portStr = portEdit->text();
 
     if (ip.isEmpty() || portStr.isEmpty()) {
-        QMessageBox::warning(this, "Error", "Please fill all fields");
+        QMessageBox::warning(this, "Error", "Please enter both IP address and port");
         return;
     }
 
     bool ok;
     quint16 port = portStr.toUShort(&ok);
-    if (!ok) {
+    if (!ok || port == 0) {
         QMessageBox::warning(this, "Error", "Invalid port number");
         return;
     }
 
-    statusLabel->setText("Connecting...");
-    connectButton->setEnabled(false);
-
-    if (!networkManager->connectToServer(ip, port)) {
-        statusLabel->setText("Already connected");
-        connectButton->setEnabled(true);
-    }
-}
-
-void ServerAddressWindow::onConnectionError(const QString &error)
-{
-    statusLabel->setText("Connection failed");
-    QMessageBox::warning(this, "Connection Error", error);
-    connectButton->setEnabled(true);
-}
-
-void ServerAddressWindow::onConnectionSuccess()
-{
-    statusLabel->setText("Connected successfully");
-    emit connectionEstablished();
-    accept();
+    std::cout << "Emitting serverAddressAccepted signal with IP: " 
+              << ip.toStdString() << " and port: " << port << std::endl;
+    
+    emit serverAddressAccepted(ip, port);
 }

@@ -1,0 +1,1 @@
+/usr/bin/c++ -Wl,-search_paths_first -Wl,-headerpad_max_install_names CMakeFiles/TCPChatServer.dir/src/main.cpp.o -o ../bin/TCPChatServer.app/Contents/MacOS/TCPChatServer  ../lib/libserver_lib.a /usr/local/lib/libboost_system.dylib /usr/local/lib/libboost_thread.dylib /usr/local/lib/libboost_regex.dylib

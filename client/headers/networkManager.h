@@ -2,8 +2,8 @@
 #define NETWORKMANAGER_H
 
 #include <QObject>
+#include <QTcpSocket>
 #include <QString>
-#include "networkThread.h"
 
 class NetworkManager : public QObject
 {
@@ -13,19 +13,34 @@ public:
     explicit NetworkManager(QObject *parent = nullptr);
     ~NetworkManager();
 
-    bool connectToServer(const QString &host, quint16 port);
+    bool connectToServer(const QString &host, quint16 port, const QString &username);
     void disconnectFromServer();
     void sendMessage(const QString &message);
-    bool isConnected() const;
+    bool isConnected() const { return socket && socket->state() == QAbstractSocket::ConnectedState; }
+    QString getUsername() const { return username; }
+    bool isAuthorized() const { return authorized; }
 
 signals:
     void connected();
     void disconnected();
     void messageReceived(const QString &message);
     void errorOccurred(const QString &error);
+    void authorizedSignal();
+
+private slots:
+    void onSocketConnected();
+    void onSocketDisconnected();
+    void onSocketError(QAbstractSocket::SocketError socketError);
+    void onSocketReadyRead();
 
 private:
-    NetworkThread *networkThread;
+    void handleIncomingData();
+    void sendData(const QByteArray &data);
+
+    QTcpSocket *socket;
+    QString username;
+    QByteArray buffer;
+    bool authorized = false;
 };
 
 #endif // NETWORKMANAGER_H 

@@ -1,17 +1,18 @@
 #include "server.h"
 #include "logger.h"
 
-Server::Server(io_serv& io) : accept(io, tcp::endpoint(tcp::v4(), 13)), 
-                             server_time(clock_::now()), 
-                             io_service(io) {
-        Logger::init();
-        Logger::log("Server starting...", "Server");
-        room = new Room();
-        setupSignalHandlers();
-        startThreadPool();
-        monitoringThread = std::thread(&Server::monitor, this);
-        waitForConnection();
-        Logger::log("Server started successfully", "Server");
+Server::Server(io_serv& io, const tcp::endpoint& endpoint) 
+    : accept(io, endpoint)
+    , server_time(clock_::now())
+    , io_service(io) {
+    Logger::init();
+    Logger::log("Server starting...", "Server");
+    room = new Room();
+    setupSignalHandlers();
+    startThreadPool();
+    monitoringThread = std::thread(&Server::monitor, this);
+    waitForConnection();
+    Logger::log("Server started successfully", "Server");
 }
 
 Server::~Server() {
@@ -45,7 +46,7 @@ void Server::setupSignalHandlers() {
 
 void Server::startThreadPool() {
         Logger::log("Starting thread pool with " + std::to_string(THREAD_POOL_SIZE) + " threads", "Server");
-        auto work = std::make_shared<boost::asio::io_service::work>(io_service);
+        auto work = std::make_shared<boost::asio::executor_work_guard<boost::asio::io_context::executor_type>>(io_service.get_executor());
         
         for (int i = 0; i < THREAD_POOL_SIZE; ++i) {
                 thread_pool.emplace_back([this, work]() {
@@ -176,13 +177,19 @@ void Server::acceptHandler(const boost::system::error_code& ec, User* ptr) {
                 }
                 
                 Logger::log("Sending welcome message to new user", "Server");
+                
+                // Отправляем приветственное сообщение
                 ptr->queueMsg("Welcome to the chat server!\r\n");
                 ptr->queueMsg("Please enter your nickname: ");
                 
+                // Запускаем чтение сообщений от клиента в отдельной задаче
+                // чтобы гарантировать, что это произойдет после инициализации
                 boost::asio::post(io_service, [ptr]() {
+                        Logger::log("Starting to read messages from new client", "Server");
                         ptr->readMsg();
                 });
                 
+                // Продолжаем слушать новые подключения
                 boost::asio::post(io_service, [this]() {
                         waitForConnection();
                 });

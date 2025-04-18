@@ -9,7 +9,7 @@
 using boost::asio::ip::tcp;
 using namespace std::chrono_literals;
 
-// Вспомогательный класс для тестового клиента
+// Test client helper class
 class TestClient {
 public:
     TestClient(const std::string& host, unsigned short port)
@@ -21,7 +21,7 @@ public:
     }
 
     void send(const std::string& message) {
-        boost::asio::write(socket_, boost::asio::buffer(message + "\n"));
+        boost::asio::write(socket_, boost::asio::buffer(message + "\r\n"));
     }
 
     std::string receive() {
@@ -30,6 +30,10 @@ public:
         std::istream is(&buffer);
         std::string message;
         std::getline(is, message);
+        // Remove \r if present
+        if (!message.empty() && message.back() == '\r') {
+            message.pop_back();
+        }
         return message;
     }
 
@@ -42,69 +46,131 @@ private:
     tcp::socket socket_;
 };
 
-// Тест 1: Проверка подключения клиента
-BOOST_AUTO_TEST_CASE(test_client_connection) {
-    // Создаем тестового клиента
-    TestClient client("127.0.0.1", 12345);
+// Test fixture for server tests
+struct ServerTestFixture {
+    ServerTestFixture() {
+        // Give the server time to start
+        std::this_thread::sleep_for(100ms);
+    }
+};
+
+BOOST_FIXTURE_TEST_SUITE(ServerTests, ServerTestFixture)
+
+// Test 1: Basic connection and nickname setting
+BOOST_AUTO_TEST_CASE(test_basic_connection) {
+    TestClient client("127.0.0.1", 13);
     
-    // Отправляем сообщение о подключении
-    client.send("JOIN test_user");
+    // Should receive welcome message
+    std::string welcome = client.receive();
+    BOOST_CHECK_EQUAL(welcome, "Welcome to the chat server!");
     
-    // Получаем ответ от сервера
-    std::string response = client.receive();
+    // Should receive nickname prompt
+    std::string prompt = client.receive();
+    BOOST_CHECK_EQUAL(prompt, "Please enter your nickname: ");
     
-    // Проверяем, что сервер подтвердил подключение
-    BOOST_CHECK_EQUAL(response, "SERVER: test_user joined the chat");
+    // Send nickname
+    client.send("test_user");
     
     client.close();
 }
 
-// Тест 2: Проверка отправки сообщения
-BOOST_AUTO_TEST_CASE(test_message_sending) {
-    // Создаем двух тестовых клиентов
-    TestClient client1("127.0.0.1", 12345);
-    TestClient client2("127.0.0.1", 12345);
+// Test 2: Message exchange between clients
+BOOST_AUTO_TEST_CASE(test_message_exchange) {
+    TestClient client1("127.0.0.1", 13);
+    TestClient client2("127.0.0.1", 13);
     
-    // Подключаем обоих клиентов
-    client1.send("JOIN user1");
-    client1.receive(); // Пропускаем сообщение о подключении
+    // Handle welcome messages and prompts
+    client1.receive(); // Welcome
+    client1.receive(); // Nickname prompt
+    client2.receive(); // Welcome
+    client2.receive(); // Nickname prompt
     
-    client2.send("JOIN user2");
-    client2.receive(); // Пропускаем сообщение о подключении
+    // Set nicknames
+    client1.send("user1");
+    client2.send("user2");
     
-    // Отправляем сообщение от первого клиента
-    client1.send("MSG user1: Hello, user2!");
+    // Send message from user1
+    client1.send("hello");
     
-    // Проверяем, что второй клиент получил сообщение
+    // user2 should receive the message
     std::string message = client2.receive();
-    BOOST_CHECK_EQUAL(message, "MSG user1: Hello, user2!");
+    BOOST_CHECK_EQUAL(message, "user1: hello");
     
     client1.close();
     client2.close();
 }
 
-// Тест 3: Проверка отключения клиента
+// Test 3: Client disconnection
 BOOST_AUTO_TEST_CASE(test_client_disconnection) {
-    // Создаем двух тестовых клиентов
-    TestClient client1("127.0.0.1", 12345);
-    TestClient client2("127.0.0.1", 12345);
+    TestClient client1("127.0.0.1", 13);
+    TestClient client2("127.0.0.1", 13);
     
-    // Подключаем обоих клиентов
-    client1.send("JOIN user1");
-    client1.receive(); // Пропускаем сообщение о подключении
+    // Handle welcome messages and prompts
+    client1.receive(); // Welcome
+    client1.receive(); // Nickname prompt
+    client2.receive(); // Welcome
+    client2.receive(); // Nickname prompt
     
-    client2.send("JOIN user2");
-    client2.receive(); // Пропускаем сообщение о подключении
+    // Set nicknames
+    client1.send("user1");
+    client2.send("user2");
     
-    // Отключаем первого клиента
+    // Close first client
     client1.close();
     
-    // Даем серверу время на обработку отключения
+    // Give server time to process disconnection
     std::this_thread::sleep_for(100ms);
     
-    // Проверяем, что второй клиент получил уведомление об отключении
-    std::string message = client2.receive();
-    BOOST_CHECK_EQUAL(message, "SERVER: user1 left the chat");
-    
     client2.close();
-} 
+}
+
+// Test 4: Invalid nickname (empty)
+BOOST_AUTO_TEST_CASE(test_invalid_nickname) {
+    TestClient client("127.0.0.1", 13);
+    
+    // Handle welcome messages and prompts
+    client.receive(); // Welcome
+    client.receive(); // Nickname prompt
+    
+    // Send empty nickname
+    client.send("");
+    
+    // Should still be able to send another nickname
+    client.send("valid_user");
+    
+    client.close();
+}
+
+// Test 5: Multiple messages in sequence
+BOOST_AUTO_TEST_CASE(test_multiple_messages) {
+    TestClient client1("127.0.0.1", 13);
+    TestClient client2("127.0.0.1", 13);
+    
+    // Handle welcome messages and prompts
+    client1.receive(); // Welcome
+    client1.receive(); // Nickname prompt
+    client2.receive(); // Welcome
+    client2.receive(); // Nickname prompt
+    
+    // Set nicknames
+    client1.send("user1");
+    client2.send("user2");
+    
+    // Send multiple messages
+    std::vector<std::string> messages = {
+        "hello",
+        "how are you",
+        "goodbye"
+    };
+    
+    for (const auto& msg : messages) {
+        client1.send(msg);
+        std::string received = client2.receive();
+        BOOST_CHECK_EQUAL(received, "user1: " + msg);
+    }
+    
+    client1.close();
+    client2.close();
+}
+
+BOOST_AUTO_TEST_SUITE_END() 

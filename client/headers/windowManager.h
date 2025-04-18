@@ -2,10 +2,13 @@
 #define WINDOWMANAGER_H
 
 #include <QObject>
-#include "serverAddressWindow.h"
-#include "usernameWindow.h"
-#include "chatWindow.h"
-#include "networkManager.h"
+#include <QString>
+#include <memory>
+
+class ServerAddressWindow;
+class UsernameWindow;
+class ChatWindow;
+class NetworkManager;
 
 class WindowManager : public QObject
 {
@@ -15,17 +18,24 @@ public:
     explicit WindowManager(QObject *parent = nullptr);
     ~WindowManager();
 
-    void showServerAddressWindow();  // Показывает первое окно для ввода адреса сервера
+    void showServerAddressWindow();
 
 private slots:
-    void onServerAddressAccepted();
-    void onUsernameAccepted(const QString &username);                // Обработка данных из второго окна
+    void onServerAddressAccepted(const QString &host, quint16 port);
+    void onUsernameAccepted(const QString &username);
+    void onConnected();
+    void onDisconnected();
+    void onNetworkError(const QString &error);
 
 private:
-    ServerAddressWindow *serverWindow;  // Окно ввода адреса сервера
-    UsernameWindow *usernameWindow;     // Окно ввода имени пользователя
-    ChatWindow *chatWindow;             // Окно чата
-    NetworkManager *networkManager;
+    std::unique_ptr<ServerAddressWindow> serverAddressWindow;
+    std::unique_ptr<UsernameWindow> usernameWindow;
+    std::unique_ptr<ChatWindow> chatWindow;
+    std::unique_ptr<NetworkManager> networkManager;
+
+    QString host;
+    quint16 port;
+    QString currentUsername;
 };
 
 #endif // WINDOWMANAGER_H

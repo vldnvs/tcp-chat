@@ -1,0 +1,9 @@
+{
+	"InstallScripts" : 
+	[
+		"/Users/isika/code/tcp-chat/build/cmake_install.cmake",
+		"/Users/isika/code/tcp-chat/build/server/cmake_install.cmake",
+		"/Users/isika/code/tcp-chat/build/client/cmake_install.cmake"
+	],
+	"Parallel" : false
+}

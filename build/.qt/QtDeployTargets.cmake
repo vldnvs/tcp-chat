@@ -1,0 +1,6 @@
+set(__QT_DEPLOY_TARGET_server_lib_FILE /Users/isika/code/tcp-chat/build/lib/libserver_lib.a)
+set(__QT_DEPLOY_TARGET_server_lib_TYPE STATIC_LIBRARY)
+set(__QT_DEPLOY_TARGET_TCPChatServer_FILE /Users/isika/code/tcp-chat/build/bin/TCPChatServer.app/Contents/MacOS/TCPChatServer)
+set(__QT_DEPLOY_TARGET_TCPChatServer_TYPE EXECUTABLE)
+set(__QT_DEPLOY_TARGET_tcp-chat-client_FILE /Users/isika/code/tcp-chat/build/bin/tcp-chat-client)
+set(__QT_DEPLOY_TARGET_tcp-chat-client_TYPE EXECUTABLE)

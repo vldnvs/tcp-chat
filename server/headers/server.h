@@ -2,7 +2,7 @@
 #define SERVER_H
 
 #include <boost/asio.hpp>
-#include <boost/bind.hpp>
+#include <boost/bind/bind.hpp>
 #include <boost/function.hpp>
 #include "user.h"
 #include <chrono>
@@ -10,7 +10,9 @@
 #include <vector>
 #include <functional>
 
-typedef boost::asio::io_service io_serv;
+using namespace boost::placeholders;
+
+typedef boost::asio::io_context io_serv;
 using boost::asio::ip::tcp;
 
 class Server {
@@ -26,8 +28,7 @@ class Server {
 	const int THREAD_POOL_SIZE = 4;
 
 public:
-
-	Server(io_serv& io);
+	Server(io_serv& io, const tcp::endpoint& endpoint);
 	~Server();
 	void stop() { 
 		is_running = false; 

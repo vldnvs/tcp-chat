@@ -1,0 +1,235 @@
+{
+	"BUILD_DIR" : "/Users/isika/code/tcp-chat/build/client/tcp-chat-client_autogen",
+	"CMAKE_BINARY_DIR" : "/Users/isika/code/tcp-chat/build",
+	"CMAKE_CURRENT_BINARY_DIR" : "/Users/isika/code/tcp-chat/build/client",
+	"CMAKE_CURRENT_SOURCE_DIR" : "/Users/isika/code/tcp-chat/client",
+	"CMAKE_EXECUTABLE" : "/usr/local/bin/cmake",
+	"CMAKE_LIST_FILES" : 
+	[
+		"/Users/isika/code/tcp-chat/client/CMakeLists.txt",
+		"/usr/local/lib/cmake/Qt6/Qt6ConfigVersion.cmake",
+		"/usr/local/lib/cmake/Qt6/Qt6ConfigVersionImpl.cmake",
+		"/usr/local/lib/cmake/Qt6/Qt6Config.cmake",
+		"/usr/local/lib/cmake/Qt6/Qt6ConfigExtras.cmake",
+		"/usr/local/lib/cmake/Qt6/QtPublicCMakeVersionHelpers.cmake",
+		"/usr/local/lib/cmake/Qt6/QtPublicCMakeHelpers.cmake",
+		"/usr/local/lib/cmake/Qt6/QtInstallPaths.cmake",
+		"/usr/local/lib/cmake/Qt6/Qt6Targets.cmake",
+		"/usr/local/lib/cmake/Qt6/Qt6VersionlessAliasTargets.cmake",
+		"/usr/local/Cellar/qt/6.9.0/lib/cmake/Qt6/QtFeature.cmake",
+		"/usr/local/share/cmake/Modules/CheckCXXCompilerFlag.cmake",
+		"/usr/local/Cellar/qt/6.9.0/lib/cmake/Qt6/QtFeatureCommon.cmake",
+		"/usr/local/Cellar/qt/6.9.0/lib/cmake/Qt6/QtPublicAndroidHelpers.cmake",
+		"/usr/local/Cellar/qt/6.9.0/lib/cmake/Qt6/QtPublicAppleHelpers.cmake",
+		"/usr/local/Cellar/qt/6.9.0/lib/cmake/Qt6/QtPublicCMakeHelpers.cmake",
+		"/usr/local/Cellar/qt/6.9.0/lib/cmake/Qt6/QtPublicCMakeVersionHelpers.cmake",
+		"/usr/local/Cellar/qt/6.9.0/lib/cmake/Qt6/QtPublicDependencyHelpers.cmake",
+		"/usr/local/Cellar/qt/6.9.0/lib/cmake/Qt6/QtPublicExternalProjectHelpers.cmake",
+		"/usr/local/Cellar/qt/6.9.0/lib/cmake/Qt6/QtPublicFinalizerHelpers.cmake",
+		"/usr/local/Cellar/qt/6.9.0/lib/cmake/Qt6/QtPublicFindPackageHelpers.cmake",
+		"/usr/local/Cellar/qt/6.9.0/lib/cmake/Qt6/QtPublicGitHelpers.cmake",
+		"/usr/local/Cellar/qt/6.9.0/lib/cmake/Qt6/QtPublicPluginHelpers.cmake",
+		"/usr/local/Cellar/qt/6.9.0/lib/cmake/Qt6/QtPublicPluginHelpers_v2.cmake",
+		"/usr/local/Cellar/qt/6.9.0/lib/cmake/Qt6/QtPublicSbomAttributionHelpers.cmake",
+		"/usr/local/Cellar/qt/6.9.0/lib/cmake/Qt6/QtPublicSbomCpeHelpers.cmake",
+		"/usr/local/Cellar/qt/6.9.0/lib/cmake/Qt6/QtPublicSbomDepHelpers.cmake",
+		"/usr/local/Cellar/qt/6.9.0/lib/cmake/Qt6/QtPublicSbomFileHelpers.cmake",
+		"/usr/local/Cellar/qt/6.9.0/lib/cmake/Qt6/QtPublicSbomGenerationHelpers.cmake",
+		"/usr/local/Cellar/qt/6.9.0/lib/cmake/Qt6/QtPublicSbomHelpers.cmake",
+		"/usr/local/Cellar/qt/6.9.0/lib/cmake/Qt6/QtPublicSbomLicenseHelpers.cmake",
+		"/usr/local/Cellar/qt/6.9.0/lib/cmake/Qt6/QtPublicSbomOpsHelpers.cmake",
+		"/usr/local/Cellar/qt/6.9.0/lib/cmake/Qt6/QtPublicSbomPurlHelpers.cmake",
+		"/usr/local/Cellar/qt/6.9.0/lib/cmake/Qt6/QtPublicSbomPythonHelpers.cmake",
+		"/usr/local/Cellar/qt/6.9.0/lib/cmake/Qt6/QtPublicSbomQtEntityHelpers.cmake",
+		"/usr/local/Cellar/qt/6.9.0/lib/cmake/Qt6/QtPublicSbomSystemDepHelpers.cmake",
+		"/usr/local/Cellar/qt/6.9.0/lib/cmake/Qt6/QtPublicTargetHelpers.cmake",
+		"/usr/local/Cellar/qt/6.9.0/lib/cmake/Qt6/QtPublicTestHelpers.cmake",
+		"/usr/local/Cellar/qt/6.9.0/lib/cmake/Qt6/QtPublicToolHelpers.cmake",
+		"/usr/local/Cellar/qt/6.9.0/lib/cmake/Qt6/QtPublicWalkLibsHelpers.cmake",
+		"/usr/local/Cellar/qt/6.9.0/lib/cmake/Qt6/QtPublicWindowsHelpers.cmake",
+		"/usr/local/share/cmake/Modules/CMakeFindDependencyMacro.cmake",
+		"/usr/local/lib/cmake/Qt6/Qt6Dependencies.cmake",
+		"/usr/local/lib/cmake/Qt6Network/Qt6NetworkConfigVersion.cmake",
+		"/usr/local/lib/cmake/Qt6Network/Qt6NetworkConfigVersionImpl.cmake",
+		"/usr/local/lib/cmake/Qt6Network/Qt6NetworkConfig.cmake",
+		"/usr/local/share/cmake/Modules/CMakeFindDependencyMacro.cmake",
+		"/usr/local/lib/cmake/Qt6Network/Qt6NetworkDependencies.cmake",
+		"/usr/local/lib/cmake/Qt6Network/Qt6NetworkTargets.cmake",
+		"/usr/local/lib/cmake/Qt6Network/Qt6NetworkTargets-release.cmake",
+		"/usr/local/lib/cmake/Qt6Network/Qt6NetworkAdditionalTargetInfo.cmake",
+		"/usr/local/lib/cmake/Qt6NetworkPrivate/Qt6NetworkPrivateConfigVersion.cmake",
+		"/usr/local/lib/cmake/Qt6NetworkPrivate/Qt6NetworkPrivateConfigVersionImpl.cmake",
+		"/usr/local/lib/cmake/Qt6NetworkPrivate/Qt6NetworkPrivateConfig.cmake",
+		"/usr/local/share/cmake/Modules/CMakeFindDependencyMacro.cmake",
+		"/usr/local/lib/cmake/Qt6NetworkPrivate/Qt6NetworkPrivateDependencies.cmake",
+		"/usr/local/lib/cmake/Qt6NetworkPrivate/Qt6NetworkPrivateTargets.cmake",
+		"/usr/local/lib/cmake/Qt6NetworkPrivate/Qt6NetworkPrivateAdditionalTargetInfo.cmake",
+		"/usr/local/lib/cmake/Qt6NetworkPrivate/Qt6NetworkPrivateVersionlessAliasTargets.cmake",
+		"/usr/local/lib/cmake/Qt6Network/Qt6NetworkPlugins.cmake",
+		"/usr/local/lib/cmake/Qt6Network/Qt6QGlibNetworkInformationPluginConfig.cmake",
+		"/usr/local/share/cmake/Modules/CMakeFindDependencyMacro.cmake",
+		"/usr/local/lib/cmake/Qt6Network/Qt6QGlibNetworkInformationPluginTargets.cmake",
+		"/usr/local/lib/cmake/Qt6Network/Qt6QGlibNetworkInformationPluginTargets-release.cmake",
+		"/usr/local/lib/cmake/Qt6Network/Qt6QGlibNetworkInformationPluginAdditionalTargetInfo.cmake",
+		"/usr/local/lib/cmake/Qt6Network/Qt6QSCNetworkReachabilityNetworkInformationPluginConfig.cmake",
+		"/usr/local/share/cmake/Modules/CMakeFindDependencyMacro.cmake",
+		"/usr/local/lib/cmake/Qt6Network/Qt6QSCNetworkReachabilityNetworkInformationPluginTargets.cmake",
+		"/usr/local/lib/cmake/Qt6Network/Qt6QSCNetworkReachabilityNetworkInformationPluginTargets-release.cmake",
+		"/usr/local/lib/cmake/Qt6Network/Qt6QSCNetworkReachabilityNetworkInformationPluginAdditionalTargetInfo.cmake",
+		"/usr/local/lib/cmake/Qt6Network/Qt6QSecureTransportBackendPluginConfig.cmake",
+		"/usr/local/share/cmake/Modules/CMakeFindDependencyMacro.cmake",
+		"/usr/local/lib/cmake/Qt6Network/Qt6QSecureTransportBackendPluginTargets.cmake",
+		"/usr/local/lib/cmake/Qt6Network/Qt6QSecureTransportBackendPluginTargets-release.cmake",
+		"/usr/local/lib/cmake/Qt6Network/Qt6QSecureTransportBackendPluginAdditionalTargetInfo.cmake",
+		"/usr/local/lib/cmake/Qt6Network/Qt6QTlsBackendCertOnlyPluginConfig.cmake",
+		"/usr/local/share/cmake/Modules/CMakeFindDependencyMacro.cmake",
+		"/usr/local/lib/cmake/Qt6Network/Qt6QTlsBackendCertOnlyPluginTargets.cmake",
+		"/usr/local/lib/cmake/Qt6Network/Qt6QTlsBackendCertOnlyPluginTargets-release.cmake",
+		"/usr/local/lib/cmake/Qt6Network/Qt6QTlsBackendCertOnlyPluginAdditionalTargetInfo.cmake",
+		"/usr/local/lib/cmake/Qt6Network/Qt6QTlsBackendOpenSSLPluginConfig.cmake",
+		"/usr/local/share/cmake/Modules/CMakeFindDependencyMacro.cmake",
+		"/usr/local/lib/cmake/Qt6Network/Qt6QTlsBackendOpenSSLPluginTargets.cmake",
+		"/usr/local/lib/cmake/Qt6Network/Qt6QTlsBackendOpenSSLPluginTargets-release.cmake",
+		"/usr/local/lib/cmake/Qt6Network/Qt6QTlsBackendOpenSSLPluginAdditionalTargetInfo.cmake",
+		"/usr/local/lib/cmake/Qt6Network/Qt6NetworkVersionlessAliasTargets.cmake"
+	],
+	"CMAKE_SOURCE_DIR" : "/Users/isika/code/tcp-chat",
+	"CROSS_CONFIG" : false,
+	"DEP_FILE" : "/Users/isika/code/tcp-chat/build/client/tcp-chat-client_autogen/deps",
+	"DEP_FILE_RULE_NAME" : "tcp-chat-client_autogen/timestamp",
+	"HEADERS" : 
+	[
+		[
+			"/Users/isika/code/tcp-chat/client/headers/chatWindow.h",
+			"MU",
+			"K6S233IZAZ/moc_chatWindow.cpp",
+			null
+		],
+		[
+			"/Users/isika/code/tcp-chat/client/headers/logger.h",
+			"MU",
+			"K6S233IZAZ/moc_logger.cpp",
+			null
+		],
+		[
+			"/Users/isika/code/tcp-chat/client/headers/networkManager.h",
+			"MU",
+			"K6S233IZAZ/moc_networkManager.cpp",
+			null
+		],
+		[
+			"/Users/isika/code/tcp-chat/client/headers/serverAddressWindow.h",
+			"MU",
+			"K6S233IZAZ/moc_serverAddressWindow.cpp",
+			null
+		],
+		[
+			"/Users/isika/code/tcp-chat/client/headers/usernameWindow.h",
+			"MU",
+			"K6S233IZAZ/moc_usernameWindow.cpp",
+			null
+		],
+		[
+			"/Users/isika/code/tcp-chat/client/headers/windowManager.h",
+			"MU",
+			"K6S233IZAZ/moc_windowManager.cpp",
+			null
+		]
+	],
+	"HEADER_EXTENSIONS" : [ "h", "hh", "h++", "hm", "hpp", "hxx", "in", "txx" ],
+	"INCLUDE_DIR" : "/Users/isika/code/tcp-chat/build/client/tcp-chat-client_autogen/include",
+	"MOC_COMPILATION_FILE" : "/Users/isika/code/tcp-chat/build/client/tcp-chat-client_autogen/mocs_compilation.cpp",
+	"MOC_DEFINITIONS" : 
+	[
+		"QT_CORE_LIB",
+		"QT_GUI_LIB",
+		"QT_NETWORK_LIB",
+		"QT_NO_DEBUG",
+		"QT_WIDGETS_LIB"
+	],
+	"MOC_DEPEND_FILTERS" : 
+	[
+		[
+			"Q_PLUGIN_METADATA",
+			"[\n][ \t]*Q_PLUGIN_METADATA[ \t]*\\([^\\)]*FILE[ \t]*\"([^\"]+)\""
+		]
+	],
+	"MOC_INCLUDES" : 
+	[
+		"/Users/isika/code/tcp-chat/headers",
+		"/Users/isika/code/tcp-chat/client/headers",
+		"/usr/local/lib/QtCore.framework/Headers",
+		"/usr/local/lib/QtCore.framework",
+		"/usr/local/share/qt/mkspecs/macx-clang",
+		"/usr/local/lib/QtWidgets.framework/Headers",
+		"/usr/local/lib/QtWidgets.framework",
+		"/usr/local/lib/QtGui.framework/Headers",
+		"/usr/local/lib/QtGui.framework",
+		"/usr/local/lib/QtNetwork.framework/Headers",
+		"/usr/local/lib/QtNetwork.framework",
+		"/usr/local/include",
+		"/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1",
+		"/Library/Developer/CommandLineTools/usr/lib/clang/14.0.3/include",
+		"/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include",
+		"/Library/Developer/CommandLineTools/usr/include"
+	],
+	"MOC_MACRO_NAMES" : 
+	[
+		"Q_OBJECT",
+		"Q_GADGET",
+		"Q_NAMESPACE",
+		"Q_NAMESPACE_EXPORT",
+		"Q_GADGET_EXPORT",
+		"Q_ENUM_NS"
+	],
+	"MOC_OPTIONS" : [],
+	"MOC_PATH_PREFIX" : false,
+	"MOC_PREDEFS_CMD" : 
+	[
+		"/usr/bin/c++",
+		"-std=c++17",
+		"-dM",
+		"-E",
+		"-c",
+		"/usr/local/share/cmake/Modules/CMakeCXXCompilerABI.cpp"
+	],
+	"MOC_PREDEFS_FILE" : "/Users/isika/code/tcp-chat/build/client/tcp-chat-client_autogen/moc_predefs.h",
+	"MOC_RELAXED_MODE" : false,
+	"MOC_SKIP" : [],
+	"MULTI_CONFIG" : false,
+	"PARALLEL" : 4,
+	"PARSE_CACHE_FILE" : "/Users/isika/code/tcp-chat/build/client/CMakeFiles/tcp-chat-client_autogen.dir/ParseCache.txt",
+	"QT_MOC_EXECUTABLE" : "/usr/local/share/qt/libexec/moc",
+	"QT_UIC_EXECUTABLE" : "/usr/local/share/qt/libexec/uic",
+	"QT_VERSION_MAJOR" : 6,
+	"QT_VERSION_MINOR" : 9,
+	"SETTINGS_FILE" : "/Users/isika/code/tcp-chat/build/client/CMakeFiles/tcp-chat-client_autogen.dir/AutogenUsed.txt",
+	"SOURCES" : 
+	[
+		[ "/Users/isika/code/tcp-chat/client/src/chatWindow.cpp", "MU", null ],
+		[ "/Users/isika/code/tcp-chat/client/src/logger.cpp", "MU", null ],
+		[ "/Users/isika/code/tcp-chat/client/src/main.cpp", "MU", null ],
+		[
+			"/Users/isika/code/tcp-chat/client/src/networkManager.cpp",
+			"MU",
+			null
+		],
+		[
+			"/Users/isika/code/tcp-chat/client/src/serverAddressWindow.cpp",
+			"MU",
+			null
+		],
+		[
+			"/Users/isika/code/tcp-chat/client/src/usernameWindow.cpp",
+			"MU",
+			null
+		],
+		[ "/Users/isika/code/tcp-chat/client/src/windowManager.cpp", "MU", null ]
+	],
+	"UIC_OPTIONS" : [],
+	"UIC_SEARCH_PATHS" : [],
+	"UIC_SKIP" : [],
+	"UIC_UI_FILES" : [],
+	"USE_BETTER_GRAPH" : true,
+	"VERBOSITY" : 0
+}

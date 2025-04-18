@@ -1,12 +1,11 @@
 #ifndef USERNAMEWINDOW_H
 #define USERNAMEWINDOW_H
 
-#include <QDialog>
+#include <QMainWindow>
+#include <QLineEdit>
+#include <QPushButton>
 
-class QLineEdit;
-class QPushButton;
-
-class UsernameWindow : public QDialog
+class UsernameWindow : public QMainWindow
 {
     Q_OBJECT
 
@@ -14,14 +13,13 @@ public:
     explicit UsernameWindow(QWidget *parent = nullptr);
 
 signals:
-    void accepted(const QString &username);
+    void usernameAccepted(const QString &username);
 
 private slots:
-    void onContinueClicked();
+    void onOkClicked();
 
 private:
-    QLineEdit *nameEdit;
-    QPushButton *continueButton;
+    QLineEdit *usernameEdit;
 };
 
 #endif // USERNAMEWINDOW_H

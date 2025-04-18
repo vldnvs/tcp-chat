@@ -1,0 +1,7 @@
+/Users/isika/code/tcp-chat/client/build/CMakeFiles/tcp-chat-client.dir
+/Users/isika/code/tcp-chat/client/build/CMakeFiles/test_windowmanager.dir
+/Users/isika/code/tcp-chat/client/build/CMakeFiles/test.dir
+/Users/isika/code/tcp-chat/client/build/CMakeFiles/edit_cache.dir
+/Users/isika/code/tcp-chat/client/build/CMakeFiles/rebuild_cache.dir
+/Users/isika/code/tcp-chat/client/build/CMakeFiles/tcp-chat-client_autogen_timestamp_deps.dir
+/Users/isika/code/tcp-chat/client/build/CMakeFiles/tcp-chat-client_autogen.dir

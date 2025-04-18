@@ -27,11 +27,18 @@ public:
 
 public:
 
-	static User* getPointer(boost::asio::io_context& io, Room* room) { return new User(io, room); };
+	static User* getPointer(boost::asio::io_context& io, Room* room) { 
+		return new User(io, room); 
+	}
 	void queueMsg(std::string msg);
 	void readMsg();
 
-	User(boost::asio::io_context& io, Room* room) :socket_(io), chatRoom(room), uptime(clock_::now()) { chatRoom->addUser(this); }
+	User(boost::asio::io_context& io, Room* room) 
+		: socket_(io)
+		, chatRoom(room)
+		, uptime(clock_::now()) 
+	{ }
+
 	void handle_write(const boost::system::error_code&, size_t);
 	void handle_read(const boost::system::error_code&, size_t);
 	tcp::socket& getSocket() {
@@ -39,7 +46,14 @@ public:
 	}
 
 	void disconnect() { 
-		boost::system::error_code ec; socket_.shutdown(boost::asio::ip::tcp::socket::shutdown_both,ec); socket_.close(ec); }
+		boost::system::error_code ec; 
+		socket_.shutdown(boost::asio::ip::tcp::socket::shutdown_both, ec); 
+		socket_.close(ec); 
+	}
+
+	std::string getName() const { return name; }
+	void handleMessage(const std::string& message);
+	Room* getRoom() const { return chatRoom; }
 
 };
 
